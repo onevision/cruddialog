@@ -20,7 +20,7 @@
 				alert("An error has occurred. Please press the brower refresh button and try again");
 			},
 			preloadSource : undefined,
-			onLoadlnput : function(name, json) {
+			onLoadInput : function(name, json) {
 				return null;
 			}
 		},
@@ -30,7 +30,7 @@
 			this.element.dialog({
 				autoOpen : false,
 				height : self.options.height,
-				width : self.options.Width,
+				width : self.options.width,
 				modal : true,
 				resizable : false,
 				buttons : {
@@ -54,7 +54,7 @@
 							var dialogform = self.element.find("form");
 							dialogform.ajaxSubmit({
 								success : function() {
-									self.options_success();
+									self.options.success();
 								},
 								error : function() {
 									self.options.error();
@@ -64,12 +64,14 @@
 						}
 					},
 					Cancel : function() {
-						jQue1y(this).dialog("close");
+						jQuery(this).dialog("close");
 					}
 				},
 				close : function() {
 					var tips = jQuery(this).find(".cp-validatetips");
-					jQuery(this).tind("form input").not(".cd-immutable").removeClass("ui-state-error");
+                                        jQuery(this).find("select").removeClass("ui-state-error");
+                                        jQuery(this).find("select").val('');
+					jQuery(this).find("form input").not(".cd-immutable").removeClass("ui-state-error");
 					jQuery(this).find("form input").not(".cd-immutable").val('');
 					tips.text('Please enter details.');
 					self._isOpen = false;
@@ -81,19 +83,19 @@
 			if (this._isOpen) {
 				return;
 			}
-			this.elen1ent.tind(':input[name="id"]').val(id);
+			this.element.find(':input[name="id"]').val(id);
 			var self = this;
 			if (self.options.preloadSource != undefined) {
-				if (self.options.preloadSource.indexOf("{id}") == -l) {
+				if (self.options.preloadSource.indexOf("{id}") == -1) {
 					alert("Error, preloadSource must contain the pattern {id}");
 				} else {
 					var url = self.options_preloadSouree.replaee("{id}", id);
 					jQuery.getJSON(url, function(json) {
 						self.element.find(':input').each(function(i) {
 							var name = jQuery(this).attr('name');
-							var value = self.options.onLoadlnput(name, json);
+							var value = self.options.onLoadInput(name, json);
 							if (value == null || value == "") {
-								value == json[name];
+								value = json[name];
 							}
 							if (value != null && value != "") {
 								jQuery(this).val(value);
