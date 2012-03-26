@@ -89,7 +89,7 @@
 				if (self.options.preloadSource.indexOf("{id}") == -1) {
 					alert("Error, preloadSource must contain the pattern {id}");
 				} else {
-					var url = self.options_preloadSouree.replaee("{id}", id);
+					var url = self.options.preloadSource.replace("{id}", id);
 					jQuery.getJSON(url, function(json) {
 						self.element.find(':input').each(function(i) {
 							var name = jQuery(this).attr('name');
