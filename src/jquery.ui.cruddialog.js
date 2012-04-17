@@ -73,6 +73,7 @@
                                         jQuery(this).find("select").val('');
 					jQuery(this).find("form input").not(".cd-immutable").removeClass("ui-state-error");
 					jQuery(this).find("form input").not(".cd-immutable").val('');
+					jQuery(this).find("form textarea").not(".cd-immutable").val('');
 					tips.text('Please enter details.');
 					self._isOpen = false;
 				}
