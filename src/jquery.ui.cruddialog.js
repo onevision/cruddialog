@@ -4,7 +4,7 @@
  * 
  * Copyright (c) 2012 One Vision Consulting Limited
  * 
- * Version 0.2
+ * Version 0.3
  */
 
 (function($, undefined) {
@@ -22,7 +22,8 @@
 			preloadSource : undefined,
 			onLoadInput : function(name, json) {
 				return null;
-			}
+			},
+			fieldNameMappings : {}
 		},
 
 		_create : function() {
@@ -39,6 +40,9 @@
 
 						jQuery(this).find("form .cd-required").each(function(i) {
 							var name = jQuery(this).attr('name');
+							if (self.options.fieldNameMappings[name] != undefined) {
+								name = self.options.fieldNameMappings[name];
+							}
 							var value = jQuery(this).val();
 							if (valid == true && (value == null || value == "")) {
 								jQuery(this).addClass("ui-state-error");
@@ -69,11 +73,12 @@
 				},
 				close : function() {
 					var tips = jQuery(this).find(".cp-validatetips");
-                                        jQuery(this).find("select").removeClass("ui-state-error");
-                                        jQuery(this).find("select").val('');
+					jQuery(this).find("select").not(".cd-immutable").removeClass("ui-state-error");
+					jQuery(this).find("select").not(".cd-immutable").val('');
 					jQuery(this).find("form input").not(".cd-immutable").removeClass("ui-state-error");
 					jQuery(this).find("form input").not(".cd-immutable").val('');
 					jQuery(this).find("form textarea").not(".cd-immutable").val('');
+					jQuery(this).find("form textarea").not(".cd-immutable").removeClass("ui-state-error");
 					tips.text('Please enter details.');
 					self._isOpen = false;
 				}
