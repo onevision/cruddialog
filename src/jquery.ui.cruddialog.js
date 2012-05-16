@@ -4,7 +4,7 @@
  * 
  * Copyright (c) 2012 One Vision Consulting Limited
  * 
- * Version 0.3
+ * Version 0.4
  */
 
 (function($, undefined) {
@@ -91,7 +91,7 @@
 			}
 			this.element.find(':input[name="id"]').val(id);
 			var self = this;
-			if (self.options.preloadSource != undefined) {
+			if (self.options.preloadSource != undefined && id != undefined) {
 				if (self.options.preloadSource.indexOf("{id}") == -1) {
 					alert("Error, preloadSource must contain the pattern {id}");
 				} else {
