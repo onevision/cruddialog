@@ -96,17 +96,25 @@
 					alert("Error, preloadSource must contain the pattern {id}");
 				} else {
 					var url = self.options.preloadSource.replace("{id}", id);
-					jQuery.getJSON(url, function(json) {
-						self.element.find(':input').each(function(i) {
-							var name = jQuery(this).attr('name');
-							var value = self.options.onLoadInput(name, json);
-							if (value == null || value == "") {
-								value = json[name];
-							}
-							if (value != null && value != "") {
-								jQuery(this).val(value);
-							}
-						});
+
+					jQuery.ajax({
+						url : url,
+						dataType : 'json',
+						success : function(json) {
+							self.element.find(':input').each(function(i) {
+								var name = jQuery(this).attr('name');
+								var value = self.options.onLoadInput(name, json);
+								if (value == null || value == "") {
+									value = json[name];
+								}
+								if (value != null && value != "") {
+									jQuery(this).val(value);
+								}
+							});
+						},
+						error : function() {
+							alert("An error has occurred. Please refresh your browser and try again");
+						}
 					});
 				}
 			}
