@@ -100,6 +100,7 @@
 					jQuery.ajax({
 						url : url,
 						dataType : 'json',
+						async: false,
 						success : function(json) {
 							self.element.find(':input').each(function(i) {
 								var name = jQuery(this).attr('name');
