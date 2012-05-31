@@ -91,6 +91,7 @@
 			}
 			this.element.find(':input[name="id"]').val(id);
 			var self = this;
+			var okToOpen = true;
 			if (self.options.preloadSource != undefined && id != undefined) {
 				if (self.options.preloadSource.indexOf("{id}") == -1) {
 					alert("Error, preloadSource must contain the pattern {id}");
@@ -100,7 +101,7 @@
 					jQuery.ajax({
 						url : url,
 						dataType : 'json',
-						async: false,
+						async : false,
 						success : function(json) {
 							self.element.find(':input').each(function(i) {
 								var name = jQuery(this).attr('name');
@@ -114,13 +115,16 @@
 							});
 						},
 						error : function() {
+							okToOpen = false;
 							alert("An error has occurred. Please refresh your browser and try again");
 						}
 					});
 				}
 			}
-			this.element.dialog("open");
-			self._isOpen = true;
+			if (okToOpen) {
+				self.element.dialog("open");
+				self._isOpen = true;
+			}
 			return self;
 		},
 		destroy : function() {
