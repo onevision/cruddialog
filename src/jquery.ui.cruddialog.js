@@ -20,6 +20,8 @@
 				alert("An error has occurred. Please press the brower refresh button and try again");
 			},
 			preloadSource : undefined,
+			onLoad : function(json) {
+			},
 			onLoadInput : function(name, json) {
 				return null;
 			},
@@ -102,7 +104,9 @@
 						url : url,
 						dataType : 'json',
 						async : false,
+						context : self,
 						success : function(json) {
+							self.options.onLoad(json);
 							self.element.find(':input').each(function(i) {
 								var name = jQuery(this).attr('name');
 								var value = self.options.onLoadInput(name, json);
