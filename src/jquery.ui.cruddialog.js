@@ -13,7 +13,7 @@
 		options : {
 			height : 250,
 			width : 390,
-			success : function() {
+			success : function(data) {
 				alert("Update complete");
 			},
 			error : function() {
@@ -59,8 +59,8 @@
 						if (valid) {
 							var dialogform = self.element.find("form");
 							dialogform.ajaxSubmit({
-								success : function() {
-									self.options.success();
+								success : function(data) {
+									self.options.success(data);
 								},
 								error : function() {
 									self.options.error();
