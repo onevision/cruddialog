@@ -28,6 +28,8 @@
 			fieldNameMappings : {}
 		},
 
+		_overlay : undefined,
+
 		_create : function() {
 			var self = this;
 			this.element.dialog({
@@ -87,15 +89,30 @@
 			});
 		},
 
+		_showOverlay : function() {
+			this._overlay = $('<div class="ui-widget-overlay"><div class="loader"></div></div>').hide().appendTo('body');
+			$('.ui-widget-overlay').show();
+			$('.ui-widget-overlay').width($(document).width());
+			$('.ui-widget-overlay').height($(document).height());
+		},
+
+		_hideOverlay : function() {
+			this._overlay.hide();
+			this._overlay.remove();
+		},
+
 		open : function(id) {
 			if (this._isOpen) {
 				return;
 			}
+			this._showOverlay();
 			this.element.find(':input[name="id"]').val(id);
 			var self = this;
 			var okToOpen = true;
 			if (self.options.preloadSource != undefined && id != undefined) {
 				if (self.options.preloadSource.indexOf("{id}") == -1) {
+					this._hideOverlay();
+					okToOpen = false;
 					alert("Error, preloadSource must contain the pattern {id}");
 				} else {
 					var url = self.options.preloadSource.replace("{id}", id);
@@ -103,9 +120,10 @@
 					jQuery.ajax({
 						url : url,
 						dataType : 'json',
-						async : false,
+						//async : false,
 						context : self,
 						success : function(json) {
+							var self = this;
 							self.options.onLoad(json);
 							self.element.find(':input').each(function(i) {
 								var name = jQuery(this).attr('name');
@@ -117,17 +135,23 @@
 									jQuery(this).val(value);
 								}
 							});
+							this._hideOverlay();
+							this.element.dialog("open");
+							this._isOpen = true;
 						},
 						error : function() {
+							this._hideOverlay();
 							okToOpen = false;
 							alert("An error has occurred. Please refresh your browser and try again");
 						}
 					});
 				}
-			}
-			if (okToOpen) {
-				self.element.dialog("open");
-				self._isOpen = true;
+			} else {
+				if (okToOpen) {
+					this._hideOverlay();
+					self.element.dialog("open");
+					self._isOpen = true;
+				}
 			}
 			return self;
 		},
