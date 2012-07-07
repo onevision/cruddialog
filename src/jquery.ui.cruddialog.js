@@ -42,6 +42,16 @@
 					"Ok" : function() {
 						var valid = true;
 
+						var showError = function(element, message) {
+							element.addClass("ui-state-error");
+							var tips = self.element.find(".cp-validatetips");
+							tips.text(message).addClass("ui-state-highlight");
+							setTimeout(function() {
+								tips.removeClass("ui-state-highlight", 1500);
+							}, 500);
+						};
+						
+						// Check required fields
 						jQuery(this).find("form .cd-required").each(function(i) {
 							var name = jQuery(this).attr('name');
 							if (self.options.fieldNameMappings[name] != undefined) {
@@ -49,15 +59,24 @@
 							}
 							var value = jQuery(this).val();
 							if (valid == true && (value == null || value == "")) {
-								jQuery(this).addClass("ui-state-error");
-								var tips = self.element.find(".cp-validatetips");
-								tips.text("Please enter a " + name).addClass("ui-state-highlight");
-								setTimeout(function() {
-									tips.removeClass("ui-state-highlight", 1500);
-								}, 500);
+								showError(jQuery(this), "Please enter a " + name);
 								valid = false;
 							}
 						});
+						if (valid) {
+							// Check time fields
+							jQuery(this).find("form .cd-time").each(function(i) {
+								var name = jQuery(this).attr('name');
+								if (self.options.fieldNameMappings[name] != undefined) {
+									name = self.options.fieldNameMappings[name];
+								}
+								var value = jQuery(this).val();
+								if (valid == true && !value.match(/^\d{1,2}[:]\d{1,2}$/)) {
+									showError(jQuery(this), "Please enter a valid time");
+									valid = false;
+								}
+							});
+						}
 						if (valid) {
 							var dialogform = self.element.find("form");
 							dialogform.ajaxSubmit({
@@ -120,7 +139,7 @@
 					jQuery.ajax({
 						url : url,
 						dataType : 'json',
-						//async : false,
+						// async : false,
 						context : self,
 						success : function(json) {
 							var self = this;
