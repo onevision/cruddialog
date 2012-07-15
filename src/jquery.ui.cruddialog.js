@@ -13,6 +13,7 @@
 		options : {
 			height : 250,
 			width : 390,
+			showOverlay : false,
 			success : function(data) {
 				alert("Update complete");
 			},
@@ -153,13 +154,15 @@
 		},
 
 		_showOverlay : function() {
-			this.element.parent().block({
-				message : null,
-				overlayCSS : {
-					backgroundColor : '#000',
-					opacity : 0.2
-				}
-			});
+			if (this.options.showOverlay) {
+				this.element.parent().block({
+					message : null,
+					overlayCSS : {
+						backgroundColor : '#000',
+						opacity : 0.2
+					}
+				});
+			}
 		},
 
 		_hideOverlay : function() {
