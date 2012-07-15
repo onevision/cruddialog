@@ -28,8 +28,6 @@
 			fieldNameMappings : {}
 		},
 
-		_overlay : undefined,
-
 		_create : function() {
 			var self = this;
 			this.element.dialog({
@@ -50,7 +48,7 @@
 								tips.removeClass("ui-state-highlight", 1500);
 							}, 500);
 						};
-						
+
 						// Check required fields
 						jQuery(this).find("form .cd-required").each(function(i) {
 							var name = jQuery(this).attr('name');
@@ -104,20 +102,68 @@
 					jQuery(this).find("form textarea").not(".cd-immutable").removeClass("ui-state-error");
 					tips.text('Please enter details.');
 					self._isOpen = false;
+				},
+				open : function(event, ui) {
+					var ok = true;
+					var id = self.element.find(':input[name="id"]').val();
+					if (self.options.preloadSource != undefined && id != '') {
+						if (self.options.preloadSource.indexOf("{id}") == -1) {
+							ok = false;
+							alert("Error, preloadSource must contain the pattern {id}");
+						} else {
+							var url = self.options.preloadSource.replace("{id}", id);
+
+							jQuery.ajax({
+								url : url,
+								dataType : 'json',
+								// async : false,
+								context : self,
+								success : function(json) {
+									var self = this;
+									self.options.onLoad(json);
+									self.element.find(':input').each(function(i) {
+										var name = jQuery(this).attr('name');
+										var value = self.options.onLoadInput(name, json);
+										if (value == null || value == "") {
+											value = json[name];
+										}
+										if (value != null && value != "") {
+											jQuery(this).val(value);
+										}
+									});
+									self.element.dialog("open");
+									self._isOpen = true;
+									self._hideOverlay();
+								},
+								error : function() {
+									ok = false;
+									alert("An error has occurred. Please refresh your browser and try again");
+								}
+							});
+						}
+					} else {
+						self._hideOverlay();
+						if (ok == false) {
+							self.element.dialog("close");
+							self._isOpen = true;
+						}
+					}
 				}
 			});
 		},
 
 		_showOverlay : function() {
-			this._overlay = $('<div class="ui-widget-overlay"><div class="loader"></div></div>').hide().appendTo('body');
-			$('.ui-widget-overlay').show();
-			$('.ui-widget-overlay').width($(document).width());
-			$('.ui-widget-overlay').height($(document).height());
+			this.element.parent().block({
+				message : null,
+				overlayCSS : {
+					backgroundColor : '#000',
+					opacity : 0.2
+				}
+			});
 		},
 
 		_hideOverlay : function() {
-			this._overlay.hide();
-			this._overlay.remove();
+			this.element.parent().unblock();
 		},
 
 		open : function(id) {
@@ -126,53 +172,9 @@
 			}
 			this._showOverlay();
 			this.element.find(':input[name="id"]').val(id);
-			var self = this;
-			var okToOpen = true;
-			if (self.options.preloadSource != undefined && id != undefined) {
-				if (self.options.preloadSource.indexOf("{id}") == -1) {
-					this._hideOverlay();
-					okToOpen = false;
-					alert("Error, preloadSource must contain the pattern {id}");
-				} else {
-					var url = self.options.preloadSource.replace("{id}", id);
-
-					jQuery.ajax({
-						url : url,
-						dataType : 'json',
-						// async : false,
-						context : self,
-						success : function(json) {
-							var self = this;
-							self.options.onLoad(json);
-							self.element.find(':input').each(function(i) {
-								var name = jQuery(this).attr('name');
-								var value = self.options.onLoadInput(name, json);
-								if (value == null || value == "") {
-									value = json[name];
-								}
-								if (value != null && value != "") {
-									jQuery(this).val(value);
-								}
-							});
-							this._hideOverlay();
-							this.element.dialog("open");
-							this._isOpen = true;
-						},
-						error : function() {
-							this._hideOverlay();
-							okToOpen = false;
-							alert("An error has occurred. Please refresh your browser and try again");
-						}
-					});
-				}
-			} else {
-				if (okToOpen) {
-					this._hideOverlay();
-					self.element.dialog("open");
-					self._isOpen = true;
-				}
-			}
-			return self;
+			this.element.dialog("open");
+			this._isOpen = true;
+			return this;
 		},
 		destroy : function() {
 			this.element.dialog.destroy();
